@@ -3,6 +3,7 @@ import sys
 import configparser
 import logging
 import slack_bolt
+from slack_bolt import logger
 
 def do_preflight_checks():
     # Make sure our slackbot.conf and all its required values exist
@@ -35,6 +36,14 @@ def do_preflight_checks():
         elif not (conf_parser['JIRA_CONF']['JIRA_PREFIXES']):
             logging.warning("Missing SLACK_BOT_TOKEN value in slackbot.conf. I"
                             " will default to \"/([A-Z]+)-([0-9]+)/g\"")
+
+
+    # Attempt to set up a slack instance with the given token. If this fails
+    # then we know the values are bad
+
+    test_app = slack_bolt.App(logger=logger,                 
+                signing_secret=conf_parser['SLACK_CONF']['SLACK_SIGN_SECRET'],
+                token=conf_parser['SLACK_CONF']['SLACK_BOT_TOKEN'])
 
 def gen_conf_file():
     new_conf = open("slackbot.conf", "w")
