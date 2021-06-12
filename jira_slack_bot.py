@@ -41,7 +41,7 @@ def do_preflight_checks():
     # Attempt to set up a slack instance with the given token. If this fails
     # then we know the values are bad
 
-    test_app = slack_bolt.App(logger=logger,                 
+    test_app = slack_bolt.App(                 
                 signing_secret=conf_parser['SLACK_CONF']['SLACK_SIGN_SECRET'],
                 token=conf_parser['SLACK_CONF']['SLACK_BOT_TOKEN'])
 
@@ -50,3 +50,18 @@ def gen_conf_file():
     new_conf.write("[SLACK_CONF]\nSLACK_BOT_TOKEN=\"\"\n" \
                     "SLACK_SIGN_SECRET=\"\"\n\n" \
                     "[JIRA_CONF]\nJIRA_URL=\"\"\nJIRA_PREFIXES=\"\"\n")
+
+def main():
+    do_preflight_checks()
+
+    conf_parser = configparser.ConfigParser()
+    conf_parser.read('slackbot.conf')
+    slack_app = slack_bolt.App(                 
+                signing_secret=conf_parser['SLACK_CONF']['SLACK_SIGN_SECRET'],
+                token=conf_parser['SLACK_CONF']['SLACK_BOT_TOKEN'])
+
+    slack_app.start()
+    
+if __name__ == "__main__":
+    logging.basicConfig()
+    main()
